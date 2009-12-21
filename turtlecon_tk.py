@@ -8,8 +8,9 @@
 
 from turtle import *
 from Tkinter import *
+#from pmw import *
 import sys
-
+color_list = ["red", "green", "blue", "brown"]
 def go():
     """ compile code to code object and run """
     code_text = codebox.get(0.0,END)
@@ -28,6 +29,14 @@ def history_clear():
 def code_clear():
     """ clear code box """
     codebox.delete(1.0, END)
+def set_color():
+#    print dir(colors)
+#    print colors.selection_get(ACTIVE)
+    color_str  = """\ncolor('%s')\n""" % (color_list[colors.index(ACTIVE)])
+    codebox.insert(END, color_str)
+                                     
+def popup():
+    colors.post(color_btn.winfo_rootx(), color_btn.winfo_rooty())
 
 #TODO: make control window stay on top unless minimized
 #TODO: make turtle window stay on top unless minimized
@@ -42,17 +51,26 @@ history_label = Label(root, text="History")
 history_label.pack()
 history_box = Text(root, height=15, width=80)
 history_box.pack()
-history_save_btn = Button(root, text="Save", command=history_save)
-history_save_btn.pack()
-history_clear_btn = Button(root, text="Clear", command=history_clear)
-history_clear_btn.pack()
+history_controls = Frame(root, borderwidth=2, relief='sunken')
+history_save_btn = Button(history_controls, text="Save", command=history_save)
+history_save_btn.pack(side=LEFT)
+history_clear_btn = Button(history_controls, text="Clear", command=history_clear)
+history_clear_btn.pack(side=LEFT)
+history_controls.pack(fill=X)
 code_label = Label(root, text="Code")
 code_label.pack()
 codebox = Text(root, height=15, width=80)
 codebox.pack()
-
-go_btn = Button(root, text="Go!", command=go)
-code_clear_btn = Button(root, text="Clear", command=code_clear)
-go_btn.pack()
-code_clear_btn.pack()
+code_controls = Frame(root, borderwidth=2, relief='sunken')
+go_btn = Button(code_controls, text="Go!", command=go)
+code_clear_btn = Button(code_controls, text="Clear", command=code_clear)
+go_btn.pack(side=LEFT)
+code_clear_btn.pack(side=LEFT)
+color_btn = Button(code_controls, text="Colors", command=popup)
+color_btn.pack(side=LEFT)
+code_controls.pack(fill=X)
+colors = Menu(code_controls, tearoff=0)
+for color_name in color_list:
+    colors.add_command(label=color_name, command=set_color)
+#colors.pack(side=LEFT)
 root.mainloop()
