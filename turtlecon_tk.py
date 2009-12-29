@@ -1,50 +1,159 @@
 #!/bin/env python
 
-""" Console to "drive" the turtle
+""" Console to "drive" the Python turtle
 
-    VLC, 12/10/2009
+    Copyright 2009, Vern Ceder, vceder@gmail.com
+   
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-
 from turtle import *
 from Tkinter import *
-#from pmw import *
 import sys
+from code import InteractiveInterpreter
+
+from tk_colors import tk_colors
 color_list = ["red", "green", "blue", "brown"]
-def go(event=None):
-    """ compile code to code object and run """
-    code_text = codebox.get(0.0,END)
-    print code_text
-    code = compile(code_text, "-", 'exec')
-    eval(code)
-    codebox.delete(1.0, END)
-    history_box.insert(END, code_text)
-    # need to grab output and display
-def history_save():
-    """ save selection or all, if no selection """
-    pass
-def history_clear():
-    """  clear history box """
-    history_box.delete(1.0, END)
-def code_clear():
-    """ clear code box """
-    codebox.delete(1.0, END)
-def set_color():
-#    print dir(colors)
-#    print colors.selection_get(ACTIVE)
-    color_str  = """color('%s')""" % (color_list[colors.index(ACTIVE)])
-    codebox.insert(END, color_str)
-    go()
-#    print colors.keys()
-                                     
-def popup():
-    colors.post(color_btn.winfo_rootx(), color_btn.winfo_rooty())
 
-def click(event=None, event2=None):
-    print event, event2
-    pencolor('black')
-    width(width()+2)
+class TurtleConGUI(Frame):
+    def __init__(self, master=None):
 
+        Frame.__init__(self, master)
+        self.master.title("Turtle Control")
+        self.pack()
+        self.create_history_box()
+        self.create_code_box()
+        locals_dict = dict(locals())
+        self.interp = InteractiveInterpreter(locals=locals_dict)
+        onclick(self.click)
+        self.grids = []
+        self.grid_lines()
+
+    def create_history_box(self):
+        self.history_label = Label(self, text="History")
+        self.history_label.pack()
+        self.history_box = Text(self, height=15, width=80)
+        self.history_box.pack()
+        self.history_controls = Frame(self, borderwidth=2, relief='sunken')
+        self.history_save_btn = Button(self.history_controls, text="Save", command=self.history_save)
+        self.history_save_btn.pack(side=LEFT)
+        self.history_clear_btn = Button(self.history_controls, text="Clear", command=self.history_clear)
+        self.history_clear_btn.pack(side=LEFT)
+        self.history_controls.pack(fill=X)
+
+    def create_code_box(self):
+
+        self.code_label = Label(self, text="Code")
+        self.code_label.pack()
+        self.codebox = Text(self, height=15, width=80)
+        ## codebox.bind("<Return>", go)
+        self.codebox.pack()
+        self.code_controls = Frame(self, borderwidth=2, relief='sunken')
+        self.go_btn = Button(self.code_controls, text="Go!", command=self.go)
+        self.code_clear_btn = Button(self.code_controls, text="Clear", command=self.code_clear)
+        self.go_btn.pack(side=LEFT)
+        self.code_clear_btn.pack(side=LEFT)
+        self.color_btn = Button(self.code_controls, text="Colors", command=self.popup)
+        self.color_btn.pack(side=LEFT)
+        self.code_controls.pack(fill=X)
+        self.colors = Menu(self.code_controls, tearoff=0)
+        for color_name in color_list:
+            self.colors.add_command(label=color_name, command=self.set_color)
+        self.hide_grid_btn = Button(self.code_controls, text="Hide Grid", command=self.hide_grid)
+        self.hide_grid_btn.pack(side=LEFT)
+    def go(self, event=None):
+        """ compile code to code object and run """
+        print getturtle().position()
+        code_text = self.codebox.get(0.0,END)
+        print code_text
+        ## code = self.interp.runsource(code_text)
+        code = compile(code_text, "-", 'exec')
+        eval(code)
+        ## self.interp.runcode(code)
+        self.codebox.delete(1.0, END)
+        self.history_box.insert(END, code_text)
+        print getturtle().position()
+        # need to grab output and display
+
+
+    def history_save(self):
+        """ save selection or all, if no selection """
+        pass
+    def history_clear(self):
+        """  clear history box """
+        self.history_box.delete(1.0, END)
+    def code_clear(self):
+        """ clear code box """
+        self.codebox.delete(1.0, END)
+    def set_color(self):
+    #    print dir(colors)
+    #    print colors.selection_get(ACTIVE)
+        color_str  = """color('%s')""" % (color_list[self.colors.index(ACTIVE)])
+        self.codebox.insert(END, color_str)
+        self.go()
+    #    print colors.keys()
+
+    def popup(self):
+        self.colors.post(self.color_btn.winfo_rootx(), self.color_btn.winfo_rooty())
+
+    def click(self,event=None, event2=None):
+        print event, event2
+        pencolor('black')
+        width(width()+2)
+
+    def grid_lines(self):
+        cv = getcanvas()
+        line = cv.create_line(0, window_height()/2, 0, -window_height()/2, width=2, stipple="gray50", tags="gridline")
+        self.grids.append(line)
+        line = cv.create_line(window_width()/2, 0, -window_width()/2, 0, width=2, stipple="gray50", tags="gridline")
+        self.grids.append(line)
+        for x in range(100, window_width()/2, 100):
+            line = cv.create_line(x, window_height()/2, x, -window_height()/2, width=1,
+                                  stipple="gray50",tags="gridline")
+            self.grids.append(line)
+            text = cv.create_text(x, 0, stipple="gray25", text=str(x))
+            self.grids.append(text)
+            
+        for x in range(-100, -window_width()/2, -100):
+            line = cv.create_line(x, window_height()/2, x, -window_height()/2, width=1,
+                                  stipple="gray50",tags="gridline")
+            self.grids.append(line)
+            text = cv.create_text(x, 0, stipple="gray25", text=str(x))
+            self.grids.append(text)
+            
+
+        for y in range(100, window_height()/2, 100):
+            line = cv.create_line(window_width()/2, y, -window_width()/2, y, width=1,
+                                  stipple="gray25",tags="gridline")
+            self.grids.append(line)
+            text = cv.create_text(0, y, stipple="gray25", text=str(y))
+            self.grids.append(text)
+            
+        for y in range(-100, -window_height()/2, -100):
+            line = cv.create_line(window_width()/2, y, -window_width()/2, y, width=1,
+                                  stipple="gray25",tags="gridline")
+            self.grids.append(line)
+            text = cv.create_text(0, y, stipple="gray25", text=str(y))
+            self.grids.append(text)
+            self.hide_grid_btn.config(command=self.hide_grid, text="Hide Grid")
+            
+    def hide_grid(self):
+        cv = getcanvas()
+        for item in self.grids:
+            cv.delete(item)
+        cv.update()
+        self.hide_grid_btn.config(command=self.grid_lines, text="Show Grid")
 
 #TODO: make control window stay on top unless minimized
 #TODO: make turtle window stay on top unless minimized
@@ -53,34 +162,8 @@ def click(event=None, event2=None):
 #TODO: reset screen or even close screen
 #TODO: help?
 
-root = Tk()
-root.title("Turtle Control Window")
-history_label = Label(root, text="History")
-history_label.pack()
-history_box = Text(root, height=15, width=80)
-history_box.pack()
-history_controls = Frame(root, borderwidth=2, relief='sunken')
-history_save_btn = Button(history_controls, text="Save", command=history_save)
-history_save_btn.pack(side=LEFT)
-history_clear_btn = Button(history_controls, text="Clear", command=history_clear)
-history_clear_btn.pack(side=LEFT)
-history_controls.pack(fill=X)
-code_label = Label(root, text="Code")
-code_label.pack()
-codebox = Text(root, height=15, width=80)
-## codebox.bind("<Return>", go)
-codebox.pack()
-code_controls = Frame(root, borderwidth=2, relief='sunken')
-go_btn = Button(code_controls, text="Go!", command=go)
-code_clear_btn = Button(code_controls, text="Clear", command=code_clear)
-go_btn.pack(side=LEFT)
-code_clear_btn.pack(side=LEFT)
-color_btn = Button(code_controls, text="Colors", command=popup)
-color_btn.pack(side=LEFT)
-code_controls.pack(fill=X)
-colors = Menu(code_controls, tearoff=0)
-for color_name in color_list:
-    colors.add_command(label=color_name, command=set_color)
-#colors.pack(side=LEFT)
-onclick(click)
-root.mainloop()
+#root = Tk()
+#root.title("Turtle Control Window")
+    #colors.pack(side=LEFT)
+app = TurtleConGUI()
+app.mainloop()
