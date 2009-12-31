@@ -21,10 +21,17 @@
 from turtle import *
 from Tkinter import *
 import sys
-from code import InteractiveInterpreter
+import code
 
 from tk_colors import tk_colors
 color_list = ["red", "green", "blue", "brown"]
+local_dict = locals()
+
+
+class newInterp(code.InteractiveInterpreter):
+    def write(self,data):
+        if data != 'None\n':
+            self.window.insert(END,data)
 
 class TurtleConGUI(Frame):
     def __init__(self, master=None):
@@ -34,8 +41,9 @@ class TurtleConGUI(Frame):
         self.pack()
         self.create_history_box()
         self.create_code_box()
-        locals_dict = dict(locals())
-        self.interp = InteractiveInterpreter(locals=locals_dict)
+
+        self.interp = newInterp(local_dict )
+        self.interp.window = self.history_box
         onclick(self.click)
         self.grids = []
         self.grid_lines()
@@ -78,12 +86,16 @@ class TurtleConGUI(Frame):
         code_text = self.codebox.get(0.0,END)
         print code_text
         ## code = self.interp.runsource(code_text)
-        code = compile(code_text, "-", 'exec')
-        eval(code)
-        ## self.interp.runcode(code)
-        self.codebox.delete(1.0, END)
-        self.history_box.insert(END, code_text)
-        print getturtle().position()
+        ## code = compile(code_text, "-", 'exec')
+        ## eval(code)
+        result = self.interp.runcode(code_text)
+        if result:
+            print "... "
+        else:
+            self.interp.showsyntaxerror()
+#            self.codebox.delete(1.0, END)
+#            self.history_box.insert(END, code_text)
+            print getturtle().position()
         # need to grab output and display
 
 
@@ -99,7 +111,7 @@ class TurtleConGUI(Frame):
     def set_color(self):
     #    print dir(colors)
     #    print colors.selection_get(ACTIVE)
-        color_str  = """color('%s')""" % (color_list[self.colors.index(ACTIVE)])
+        color_str  = """color('%s')\n""" % (color_list[self.colors.index(ACTIVE)])
         self.codebox.insert(END, color_str)
         self.go()
     #    print colors.keys()
@@ -114,46 +126,59 @@ class TurtleConGUI(Frame):
 
     def grid_lines(self):
         cv = getcanvas()
-        line = cv.create_line(0, window_height()/2, 0, -window_height()/2, width=2, stipple="gray50", tags="gridline")
+        line = cv.create_line(0, window_height()/2, 0, -window_height()/2, width=2, tags="gridline", fill="gray75")
         self.grids.append(line)
-        line = cv.create_line(window_width()/2, 0, -window_width()/2, 0, width=2, stipple="gray50", tags="gridline")
+
+        line = cv.create_line(window_width()/2, 0, -window_width()/2, 0, width=2, fill="gray75", tags="gridline")
         self.grids.append(line)
         for x in range(100, window_width()/2, 100):
             line = cv.create_line(x, window_height()/2, x, -window_height()/2, width=1,
-                                  stipple="gray50",tags="gridline")
+                                  fill="gray75",tags="gridline")
             self.grids.append(line)
-            text = cv.create_text(x, 0, stipple="gray25", text=str(x))
+            text = cv.create_text(x+20, 10, fill="gray75", text=str(x),tags="gridline")
             self.grids.append(text)
             
         for x in range(-100, -window_width()/2, -100):
             line = cv.create_line(x, window_height()/2, x, -window_height()/2, width=1,
-                                  stipple="gray50",tags="gridline")
+                                  fill="gray75",tags="gridline")
             self.grids.append(line)
-            text = cv.create_text(x, 0, stipple="gray25", text=str(x))
+            text = cv.create_text(x+20, 10, fill="gray75", text=str(x),tags="gridline")
             self.grids.append(text)
             
 
         for y in range(100, window_height()/2, 100):
             line = cv.create_line(window_width()/2, y, -window_width()/2, y, width=1,
-                                  stipple="gray25",tags="gridline")
+                                  fill="gray75",tags="gridline")
             self.grids.append(line)
-            text = cv.create_text(0, y, stipple="gray25", text=str(y))
+            text = cv.create_text(20, y+10, fill="gray75", text=str(y),tags="gridline")
             self.grids.append(text)
             
         for y in range(-100, -window_height()/2, -100):
             line = cv.create_line(window_width()/2, y, -window_width()/2, y, width=1,
-                                  stipple="gray25",tags="gridline")
+                                  fill="gray75",tags="gridline")
             self.grids.append(line)
-            text = cv.create_text(0, y, stipple="gray25", text=str(y))
+            text = cv.create_text(20, y+10, fill="gray75", text=str(y),tags="gridline")
             self.grids.append(text)
             self.hide_grid_btn.config(command=self.hide_grid, text="Hide Grid")
-            
+        ## gl = cv.find_withtag("gridline")
+        ##cv.lower(gl)
+        ## cv.lower("gridline")
+        ## for item in self.grids:
+        ##     cv.lower(item)
     def hide_grid(self):
         cv = getcanvas()
         for item in self.grids:
-            cv.delete(item)
+            cv.itemconfig(item, fill="White")
+#            cv.delete(item)
         cv.update()
         self.hide_grid_btn.config(command=self.grid_lines, text="Show Grid")
+    def show_grid(self):
+        cv = getcanvas()
+        for item in self.grids:
+            cv.itemconfig(item, fill="gray75")
+#            cv.delete(item)
+        cv.update()
+        self.hide_grid_btn.config(command=self.grid_lines, text="Hide Grid")
 
 #TODO: make control window stay on top unless minimized
 #TODO: make turtle window stay on top unless minimized
