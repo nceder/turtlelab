@@ -67,7 +67,7 @@ class TurtleConGUI(Frame):
         self.if_btn = Button(self.tools_frame, text="if...", command=self.popup)
         self.if_btn.grid(row=3, column=0,sticky=W+E)
         self.go_btn = Button(self.tools_frame, text="Go!", command=self.go)
-        self.go_btn.grid(row=5, column=0, sticky=E+W+S)
+        self.go_btn.grid(row=4, column=0, sticky=E+W+S, rowspan=2)
         self.code_clear_btn = Button(self.tools_frame, text="Clear", command=self.code_clear)
         self.code_clear_btn.grid(row=6, column=0, sticky=E+W+S)
         self.hide_grid_btn = Button(self.tools_frame, text="Hide Grid", command=self.hide_grid, width=10)

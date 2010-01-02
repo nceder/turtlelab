@@ -1,0 +1,18 @@
+onclick report info about object
+autosaving/save as/loading/session browsing
+random_color()
+random_location()
+random_heading() (random_direction())
+random_size()
+random_distance()
+
+loop, conditional and function creation
+
+syntax highlighting
+
+on screen
+
+onclick - popup with coords info, offer to create turtle here?
+create turtle dialog - shape, size, heading, location, var name
+
+toggle grid lines, coordinate system - done
