@@ -30,7 +30,9 @@ from time import sleep
 
 from tk_colors import tk_colors
 color_list = ['white', 'gray', 'yellow', 'orange', "red", 'purple', "blue", "green", "brown", 'black']
-command_list = [('forward', 'How far?'), ('right', 'Degrees?')]
+command_list = [('forward', 'How far?'), ('right', 'Degrees?'), ('left', 'Degrees?'),
+                ('back', 'How far?'), ('undo', 'Undo last command'),
+                ('dot', '[size],[color]'), ('circle', 'Size [,extent, steps]') ]
 
 local_dict = locals()
 
@@ -48,7 +50,7 @@ class TurtleConGUI(Frame):
         if not master:
             master = Tk()
         self.master = master.protocol("WM_DELETE_WINDOW", self.exit)
-
+        self.indent_level = 0
         Frame.__init__(self, master)
         self.master.title("Turtle Control")
         self.grid()
@@ -58,24 +60,57 @@ class TurtleConGUI(Frame):
         onclick(self.click)
         self.grids = []
         self.grid_lines()
-#        turtlesize=2
-        print dir()
+        resizemode('user')
+        pensize(5)
+        shape('turtle')
+        color('red')
+        turtlesize(2)
         self.interp = newInterp(local_dict, self. history_box)
-        self.run_code("""resizemode('auto')\npensize(5)\nshape('turtle')\ncolor('red')""")
+        ## self.run_code("""resizemode('auto')\npensize(5)\nshape('turtle')\ncolor('red')""")
         self.tips = dict(command_list)
 
         self.calltip = CallTip(self.code_box)
-
+        ## self.code_box.event_add("<<indent>>", ":")
+        ## self.code_box.bind("<<indent>>", self.indent)
+#        self.code_box.event_add("<<tab>>", "\t") 
+        self.code_box.bind("<Tab>", self.tab)
+        self.code_box.bind("<Return>", self.newline)
+        self.code_box.bind("<BackSpace>", self.dedent)
         self.code_box.event_add("<<calltip-show>>", "(")
         self.code_box.event_add("<<calltip-hide>>", ")")
         self.code_box.bind("<<calltip-show>>", self.calltip_show)
         self.code_box.bind("<<calltip-hide>>", self.calltip_hide)
+        self.code_box.focus_set()
+    def tab(self, event=None):
+        if event.widget == self.code_box:
+            self.code_box.insert(INSERT, 4 * " " )
+            return "break"
 
-   
+    def newline(self, event=None):
+        prev_line = self.code_box.get(str(INSERT) + " linestart",
+                                      str(INSERT) + " lineend")
+        print prev_line
+        if prev_line.strip() and prev_line.strip()[-1] == ":":
+            self.indent_level += 1
+                                     
+        self.code_box.insert(INSERT, "\n" + 4 * self.indent_level * " ")
+        self.code_box.update()
+        return "break"
+        
+    def dedent(self, event=None):
+        if self.indent_level > 0:
+            line = self.code_box.get(str(INSERT)+ " linestart",
+                                     str(INSERT) + " lineend")
+            if not line.strip(): 
+                self.indent_level -= 1
+                self.code_box.delete(str(INSERT) + " -3c", INSERT)
+
+    def indent(self, event=None):
+        self.indent_level += 1
+            
     def calltip_show(self, event=None):
         key = self.calltip.widget.get(str(CURRENT)+'-2c wordstart', str(CURRENT)+ '-2c wordend')
-        self.calltip.showtip(self.tips[key], CURRENT, END)
-        print key
+        self.calltip.showtip(self.tips.get(key, ""), CURRENT, END)
 
     def calltip_hide(self, event=None):
         self.calltip.hidetip()
@@ -102,7 +137,7 @@ class TurtleConGUI(Frame):
         self.while_btn.grid(row=2, column=0,sticky=W+E)
         self.if_btn = Button(self.tools_frame, text="if...", command=self.popup)
         self.if_btn.grid(row=3, column=0,sticky=W+E)
-        self.commands_btn = Button(self.tools_frame, text="commands", command=self.popup_command)
+        self.commands_btn = Button(self.tools_frame, text="Commands", command=self.popup_command)
         self.commands_btn.grid(row=4, column=0, sticky=E+W+S)
         self.go_btn = Button(self.tools_frame, text="Go!", command=self.go)
         self.go_btn.grid(row=5, column=0, sticky=E+W+S)
@@ -187,7 +222,7 @@ class TurtleConGUI(Frame):
         self.colors.post(self.color_btn.winfo_rootx(), self.color_btn.winfo_rooty())
 
     def popup_command(self):
-        self.commands.post(self.commands_btn.winfo_rootx(), self.commands_btn.winfo_rooty())
+        self.commands.post(self.commands_btn.winfo_rootx()+50, self.commands_btn.winfo_rooty())
 
     def click(self,event=None, event2=None):
 #        print event, event2
