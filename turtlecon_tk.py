@@ -25,16 +25,16 @@ from idlelib.EditorWindow import EditorWindow
 import sys
 import code
 from idlelib.CallTipWindow import *
-CHECKHIDE_TIME = 1000
-from time import sleep
+
 from random import randint, random
 
-from tk_colors import tk_colors
-color_list = ['white', 'gray', 'yellow', 'orange', "red", 'purple', "blue", "green", "brown", 'black']
+# from tk_colors import tk_colors
+
+color_list = ["'white'", "'gray'", "'yellow'", "'orange'", "'red'", "'purple'", "'blue'", "'green'", "'brown'", "'black'", "random_color()"]
 command_list = [('forward', 'How far?'), ('right', 'Degrees?'), ('left', 'Degrees?'),
                 ('back', 'How far?'), ('undo', 'Undo last command'),
-                ('dot', '[size],[color]'), ('circle', 'Size [,extent, steps]'),
-                ('penup()',''), ('pendown()',''), ('goto', ''), ('setheading','')]
+                ('dot(<size>)', '[size],[color]'), ('circle', 'Size [,extent, steps]'),
+                ('penup()\n',''), ('pendown()\n',''), ('goto', ''), ('setheading',''), ('','')]
 
 local_dict = locals()
 
@@ -57,7 +57,7 @@ class TurtleConGUI(Frame):
         Frame.__init__(self, master)
         self.master.title("Turtle Control")
         self.grid()
-        self.edit_window = EditorWindow(root=master)
+        self.edit_window = EditorWindow(root=master, filename='test.py')
         self.max_width =  master.winfo_screenwidth()
         self.max_height =  master.winfo_screenheight()
         self.tools_x = int(self.max_width * .6)+6
@@ -103,7 +103,8 @@ class TurtleConGUI(Frame):
     def at_exit(self):
         bye()
         self.edit_window.close()
-        sys.exit()
+        self.destroy()
+        ## sys.exit()
         
     def create_code_box(self):
 
@@ -113,12 +114,33 @@ class TurtleConGUI(Frame):
         self.tools_label.grid(row=0, column=0, sticky=E+W)
         self.tools_frame = Frame(self.code_frame, borderwidth=2, relief='sunken')
         self.tools_frame.grid(row=1, column=0, sticky=W+N+S)
-        self.color_btn = Button(self.tools_frame, text="Colors", command=self.popup)
-        self.color_btn.grid(row=0, column=0,sticky=W+E)
-        self.size_btn = Button(self.tools_frame, text="Turtle size", command=self.popup_sizes)
-        self.size_btn.grid(row=1, column=0,sticky=W+E)
-        self.pen_btn = Button(self.tools_frame, text="Pen width", command=self.popup_pens)
-        self.pen_btn.grid(row=2, column=0,sticky=W+E)
+
+        self.color_frame = Frame(self.tools_frame)
+        self.color_frame.grid(row=0, column=0,sticky=W+E)
+        self.color_label = Label(self.color_frame, text="Color", anchor=W)
+        self.color_label.grid(row=0, column=0, sticky=W)
+        self.color_v = StringVar()
+        self.color_v.set("'red'")
+        self.colors = OptionMenu(self.color_frame, self.color_v, command=self.set_color, *color_list )
+        self.colors.grid(row=0, column=1, sticky=E)
+        
+        self.size_frame = Frame(self.tools_frame)
+        self.size_frame.grid(row=1, column=0,sticky=W+E)
+        self.sizes_label = Label(self.size_frame, text="Size", anchor=W)
+        self.sizes_label.grid(row=0, column=0, sticky=W+E)
+        self.size_v = IntVar()
+        self.size_v.set(2)
+        self.sizes = OptionMenu(self.size_frame, self.size_v, command=self.set_size, *list(range(5)))
+        self.sizes.grid(row=0, column=1,sticky=E)
+
+        self.pen_frame = Frame(self.tools_frame)
+        self.pen_frame.grid(row=2, column=0,sticky=W+E)
+        self.pen_label = Label(self.pen_frame, text="Pen width", anchor=W)
+        self.pen_label.grid(row=0, column=0)
+        self.pen_v = IntVar()
+        self.pen_v.set(3)
+        self.pens = OptionMenu(self.pen_frame, self.pen_v, command=self.set_pen, *list(range(7)))
+        self.pens.grid(row=0, column=1)
         ## self.close_screen_btn = Button(self.tools_frame, text="Close Screen", command=self.close_screen, width=10)
         ## self.close_screen_btn.grid(row=9, column=0, sticky=E+W+S)
         self.repeat_btn = Button(self.tools_frame, text="repeat...", command=self.add_for)
@@ -127,8 +149,18 @@ class TurtleConGUI(Frame):
         self.while_btn.grid(row=4, column=0,sticky=W+E)
         self.if_btn = Button(self.tools_frame, text="if...", command=self.add_if)
         self.if_btn.grid(row=5, column=0,sticky=W+E)
-        self.commands_btn = Button(self.tools_frame, text="Commands", command=self.popup_command)
-        self.commands_btn.grid(row=6, column=0, sticky=E+W+S)
+
+        self.command_frame = Frame(self.tools_frame)
+        self.command_frame.grid(row=6, column=0, sticky=E+W)
+        self.command_label = Label(self.command_frame, text="Commands", anchor=W)
+        self.command_label.grid(row=0, column=0, sticky=W)
+        self.command_v = StringVar()
+        self.command_v.set("")
+        self.commands = OptionMenu(self.command_frame, self.command_v, command=self.set_command,
+                                   *[x[0] for x in command_list])
+        self.commands.grid(row=0, column=1, sticky=W)
+            
+            
         self.go_btn = Button(self.tools_frame, text="Go!", command=self.go)
         self.go_btn.grid(row=8, column=0, columnspan=2, sticky=E+W+S, pady=10)
         self.go_tip = ToolTip(self.go_btn, "Run the code")
@@ -138,21 +170,9 @@ class TurtleConGUI(Frame):
         self.hide_grid_btn.grid(row=11, column=0, sticky=E+W+S)
         self.reset_screen_btn = Button(self.tools_frame, text="Reset Turtle", command=self.reset_screen, width=10)
         self.reset_screen_btn.grid(row=12, column=0, sticky=E+W+S)
+        self.quit_btn = Button(self.tools_frame, text="Quit", command=self.at_exit, width=10)
+        self.quit_btn.grid(row=13, column=0, sticky=E+W+S)
 
-        self.colors = Menu(self.tools_frame, tearoff=0)
-        for color_name in color_list:
-            self.colors.add_command(label=color_name, command=self.set_color)
-        self.sizes = Menu(self.tools_frame, tearoff=0)
-        for size in range(5):
-            self.sizes.add_command(label=str(size), command=self.set_size)
-            
-        self.pens = Menu(self.tools_frame, tearoff=0)
-        for size in range(10):
-            self.pens.add_command(label=str(size), command=self.set_pen)
-            
-        self.commands = Menu(self.tools_frame, tearoff=0)
-        for command_name, tip in command_list:
-            self.commands.add_command(label=command_name, command=self.set_command)
                                  
     def create_error_box(self):
         self.toplevel = Toplevel()
@@ -195,14 +215,14 @@ class TurtleConGUI(Frame):
         """ clear code box """
         self.edit_window.text.delete(0.0, END)
         
-    def set_color(self):
-        color_str  = """color('%s')""" % (color_list[self.colors.index(ACTIVE)])
+    def set_color(self, value=None):
+        color_str  = """color(%s)""" % (value)
         self.edit_window.text.insert(END, color_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.run_code(color_str)
 
-    def set_size(self):
-        size_str  = """turtlesize(%s)""" % (self.sizes.index(ACTIVE))
+    def set_size(self, value=None):
+        size_str  = """turtlesize(%s)""" % (value)
         self.edit_window.text.insert(END, size_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.run_code(size_str)
@@ -213,11 +233,18 @@ class TurtleConGUI(Frame):
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.run_code(size_str)
 
-    def set_command(self):
-        command_str  = """%s""" % (command_list[self.commands.index(ACTIVE)][0])
-        
+    def set_command(self, value=None):
+        command_str  = """%s""" % (value)
+        startpos = len(command_str) - command_str.rfind("<")
+        endpos = len(command_str) - command_str.rfind(">")
+            
         self.edit_window.text.insert(INSERT, command_str)
+        if startpos <= len(command_str) and endpos <= len(command_str):
+            self.edit_window.text.tag_add("replace", "%s-%sc" % (INSERT, startpos), "%s-%sc" % (INSERT, endpos))
+            self.edit_window.text.tag_config("replace",foreground="red", background="pink", underline=1)
+        self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.edit_window.text.focus_set()
+        self.command_v.set("")
 
     def add_if(self):
         command_str  = """if <what?>:"""
@@ -253,17 +280,11 @@ class TurtleConGUI(Frame):
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.edit_window.text.focus_set()
 
-    def popup(self):
-        self.colors.post(self.color_btn.winfo_rootx(), self.color_btn.winfo_rooty())
-
-    def popup_sizes(self):
-        self.sizes.post(self.size_btn.winfo_rootx(), self.size_btn.winfo_rooty())
-
-    def popup_pens(self):
-        self.pens.post(self.pen_btn.winfo_rootx(), self.pen_btn.winfo_rooty())
-        
-    def popup_command(self):
-        self.commands.post(self.commands_btn.winfo_rootx()+50, self.commands_btn.winfo_rooty())
+    def at_exit(self):
+        bye()
+        self.edit_window.close()
+        self.destroy()
+        ## sys.exit()
 
     def click(self,event=None, event2=None):
         pencolor('black')
@@ -317,8 +338,8 @@ class TurtleConGUI(Frame):
 #            cv.delete(item)
         cv.update()
         self.hide_grid_btn.config(command=self.grid_lines, text="Show Grid")
-        for t in turtles():
-            t.update()
+        ## for t in turtles():
+        ##     t.update()
     def show_grid(self):
         cv = getcanvas()
         for item in self.grids:
