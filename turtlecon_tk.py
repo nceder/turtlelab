@@ -56,26 +56,28 @@ class TurtleConGUI(Frame):
         self.master.title("Turtle Control")
         self.grid()
         self.edit_window = EditorWindow(root=master)
-        self.max_width =  master.winfo_vrootwidth()
-        self.max_height =  master.winfo_vrootheight()
-        self.tools_x = int(self.max_width * .6)
+        self.max_width =  master.winfo_screenwidth()
+        self.max_height =  master.winfo_screenheight()
+        self.tools_x = int(self.max_width * .5)+6
         self.tools_y = 0
-        self.master.geometry("200x400+%s+%s" % (self.tools_x, self.tools_y))
-        print self.master.geometry()
         self.create_code_box()
-        print self.code_frame.winfo_geometry()
-        ## self.edit_window.top.group(self.master)
         self.create_error_box()
-        self.edit_x = self.tools_x + 220
+        self.code_frame.update()
+        self.tools_w = master.winfo_width()
+        self.tools_h = master.winfo_height()
+        self.master.geometry("%sx%s+%s+%s" % (self.tools_w, self.tools_h,self.tools_x, self.tools_y))
+        
+        ## self.edit_window.top.group(self.master)
+        self.edit_x = self.tools_x + self.tools_w+ 6
         self.edit_y = 0
-        print self.code_frame.winfo_vrootx()
-        print self.master.winfo_vrootx()
-        self.edit_w = self.max_width - (self.tools_x + 220)
+        self.edit_w = self.max_width - (self.tools_x + self.tools_w+16)
         self.edit_h = int(self.max_height * .75)
         print "%sx%s+%s+%s" % (self.edit_w, self.edit_h,self.edit_x, self.edit_y)
         self.edit_window.top.geometry("%sx%s+%s+%s" % (self.edit_w, self.edit_h,self.edit_x, self.edit_y))
+        self.edit_window.text_frame.update()
+        print self.edit_window.top.winfo_geometry()
         self.screen = Screen()
-        setup(width=.6, height=.75, startx=0, starty=0)
+        setup(width=.5, height=.75, startx=0, starty=0)
         onclick(self.click)
         self.grids = []
         self.grid_lines()
