@@ -31,10 +31,12 @@ from random import randint, random
 # from tk_colors import tk_colors
 
 color_list = ["'white'", "'gray'", "'yellow'", "'orange'", "'red'", "'purple'", "'blue'", "'green'", "'brown'", "'black'", "random_color()"]
-command_list = [('forward', 'How far?'), ('right', 'Degrees?'), ('left', 'Degrees?'),
-                ('back', 'How far?'), ('undo', 'Undo last command'),
-                ('dot(<size>)', '[size],[color]'), ('circle', 'Size [,extent, steps]'),
-                ('penup()\n',''), ('pendown()\n',''), ('goto', ''), ('setheading',''), ('','')]
+command_list = {'forward':'forward(<distance?>)', 'right': 'right(<Degrees?>)',
+                'left': 'left(<Degrees?>)', 'if...':'if <what?>:\n# commands go here\n',
+                'back': 'back(<distance?>)', 'undo':'undo()',
+                'dot':'dot(<size>)',  'circle':'circle(<radius>)',
+                'penup':'penup()\n', 'pendown':'pendown()\n', 'goto': 'goto(<x, y>)',
+                'setheading':'setheading(<Degrees?>', '':''}
 
 local_dict = locals()
 
@@ -157,7 +159,7 @@ class TurtleConGUI(Frame):
         self.command_v = StringVar()
         self.command_v.set("")
         self.commands = OptionMenu(self.command_frame, self.command_v, command=self.set_command,
-                                   *[x[0] for x in command_list])
+                                   *list(command_list.keys()))
         self.commands.grid(row=0, column=1, sticky=W)
             
             
@@ -233,16 +235,18 @@ class TurtleConGUI(Frame):
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.run_code(size_str)
 
-    def set_command(self, value=None):
-        command_str  = """%s""" % (value)
-        startpos = len(command_str) - command_str.rfind("<")
-        endpos = len(command_str) - command_str.rfind(">")
+    def set_command(self, key=None):
+        command_strings = command_list[key].split("\n")
+        for command_str in command_strings:
+            startpos = len(command_str) - command_str.rfind("<")
+            endpos = len(command_str) - (command_str.rfind(">") + 1)
             
-        self.edit_window.text.insert(INSERT, command_str)
-        if startpos <= len(command_str) and endpos <= len(command_str):
-            self.edit_window.text.tag_add("replace", "%s-%sc" % (INSERT, startpos), "%s-%sc" % (INSERT, endpos))
-            self.edit_window.text.tag_config("replace",foreground="red", background="pink", underline=1)
-        self.edit_window.text.event_generate("<<newline-and-indent>>")
+            self.edit_window.text.insert(INSERT, command_str)
+            if startpos <= len(command_str) and endpos < startpos:
+                self.edit_window.text.tag_add("replace", "%s-%sc" % (INSERT, startpos), "%s-%sc" % (INSERT, endpos))
+                self.edit_window.text.tag_config("replace",foreground="red", background="lightpink", underline=1)
+            if command_str.strip():
+                self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.edit_window.text.focus_set()
         self.command_v.set("")
 
