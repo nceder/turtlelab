@@ -27,6 +27,7 @@ import code
 from idlelib.CallTipWindow import *
 CHECKHIDE_TIME = 1000
 from time import sleep
+from random import randint, random
 
 from tk_colors import tk_colors
 color_list = ['white', 'gray', 'yellow', 'orange', "red", 'purple', "blue", "green", "brown", 'black']
@@ -118,25 +119,25 @@ class TurtleConGUI(Frame):
         self.size_btn.grid(row=1, column=0,sticky=W+E)
         self.pen_btn = Button(self.tools_frame, text="Pen width", command=self.popup_pens)
         self.pen_btn.grid(row=2, column=0,sticky=W+E)
-        self.code_clear_btn = Button(self.tools_frame, text="Clear code", command=self.code_clear)
-        self.code_clear_btn.grid(row=6, column=0, sticky=E+W+S)
-        self.hide_grid_btn = Button(self.tools_frame, text="Hide Grid", command=self.hide_grid, width=10)
-        self.hide_grid_btn.grid(row=7, column=0, sticky=E+W+S)
-        self.reset_screen_btn = Button(self.tools_frame, text="Reset Turtle", command=self.reset_screen, width=10)
-        self.reset_screen_btn.grid(row=8, column=0, sticky=E+W+S)
         ## self.close_screen_btn = Button(self.tools_frame, text="Close Screen", command=self.close_screen, width=10)
         ## self.close_screen_btn.grid(row=9, column=0, sticky=E+W+S)
         self.repeat_btn = Button(self.tools_frame, text="repeat...", command=self.add_for)
-        self.repeat_btn.grid(row=0, column=1,sticky=W+E)
+        self.repeat_btn.grid(row=3, column=0,sticky=W+E)
         self.while_btn = Button(self.tools_frame, text="while...", command=self.add_while)
-        self.while_btn.grid(row=1, column=1,sticky=W+E)
+        self.while_btn.grid(row=4, column=0,sticky=W+E)
         self.if_btn = Button(self.tools_frame, text="if...", command=self.add_if)
-        self.if_btn.grid(row=2, column=1,sticky=W+E)
+        self.if_btn.grid(row=5, column=0,sticky=W+E)
         self.commands_btn = Button(self.tools_frame, text="Commands", command=self.popup_command)
-        self.commands_btn.grid(row=3, column=1, sticky=E+W+S)
+        self.commands_btn.grid(row=6, column=0, sticky=E+W+S)
         self.go_btn = Button(self.tools_frame, text="Go!", command=self.go)
-        self.go_btn.grid(row=10, column=0, columnspan=2, sticky=E+W+S)
+        self.go_btn.grid(row=8, column=0, columnspan=2, sticky=E+W+S, pady=10)
         self.go_tip = ToolTip(self.go_btn, "Run the code")
+        self.code_clear_btn = Button(self.tools_frame, text="Clear code", command=self.code_clear)
+        self.code_clear_btn.grid(row=10, column=0, sticky=E+W+S)
+        self.hide_grid_btn = Button(self.tools_frame, text="Hide Grid", command=self.hide_grid, width=10)
+        self.hide_grid_btn.grid(row=11, column=0, sticky=E+W+S)
+        self.reset_screen_btn = Button(self.tools_frame, text="Reset Turtle", command=self.reset_screen, width=10)
+        self.reset_screen_btn.grid(row=12, column=0, sticky=E+W+S)
 
         self.colors = Menu(self.tools_frame, tearoff=0)
         for color_name in color_list:
@@ -326,14 +327,24 @@ class TurtleConGUI(Frame):
         cv.update()
         self.hide_grid_btn.config(command=self.grid_lines, text="Hide Grid")
 
-    def random_size(self):
-        pass
+def random_size(size):
+    """returns a random size between 0 and size)"""
+    return randint(1, size)
 
-    def random_location(self):
-        pass
+def random_location():
+    """ returns a random location on screen"""
+    return randint(-window_width()/2, window_width()/2), randint(-window_height()/2, window_height()/2)
 
-    def random_direction(self):
-        pass
+def random_direction():
+    return randint(0, 359)
+
+def random_color():
+    """ returns a random color """
+    if colormode() == 255:
+        return randint(0,255), randint(0,255), randint(0,255)
+    else:
+        return random(), random(), random()
+        
     
 #TODO: make control window stay on top unless minimized
 #TODO: make turtle window stay on top unless minimized
