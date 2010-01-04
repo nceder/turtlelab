@@ -60,7 +60,7 @@ class TurtleConGUI(Frame):
         self.edit_window = EditorWindow(root=master)
         self.max_width =  master.winfo_screenwidth()
         self.max_height =  master.winfo_screenheight()
-        self.tools_x = int(self.max_width * .5)+6
+        self.tools_x = int(self.max_width * .6)+6
         self.tools_y = 0
         self.create_code_box()
         self.code_frame.update()
@@ -85,7 +85,7 @@ class TurtleConGUI(Frame):
         self.toplevel.geometry("%sx%s+%s+%s" % (self.errors_w, self.errors_h,self.errors_x, self.errors_y))
         self.error_box.update()
         self.screen = Screen()
-        setup(width=.5, height=.75, startx=0, starty=0)
+        setup(width=.6, height=.75, startx=0, starty=0)
         onclick(self.click)
         self.grids = []
         self.grid_lines()
@@ -115,7 +115,7 @@ class TurtleConGUI(Frame):
         self.tools_frame.grid(row=1, column=0, sticky=W+N+S)
         self.color_btn = Button(self.tools_frame, text="Colors", command=self.popup)
         self.color_btn.grid(row=0, column=0,sticky=W+E)
-        self.size_btn = Button(self.tools_frame, text="Size", command=self.popup_sizes)
+        self.size_btn = Button(self.tools_frame, text="Turtle size", command=self.popup_sizes)
         self.size_btn.grid(row=1, column=0,sticky=W+E)
         self.pen_btn = Button(self.tools_frame, text="Pen width", command=self.popup_pens)
         self.pen_btn.grid(row=2, column=0,sticky=W+E)
