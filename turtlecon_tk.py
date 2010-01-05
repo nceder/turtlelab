@@ -19,6 +19,8 @@
 
 """
 from turtle import *
+from turtle import _CFG
+_CFG['using_IDLE'] = True
 from Tkinter import *
 from idlelib.ToolTip import ToolTip
 from idlelib.EditorWindow import EditorWindow
@@ -31,12 +33,62 @@ from random import randint, random
 # from tk_colors import tk_colors
 
 color_list = ["'white'", "'gray'", "'yellow'", "'orange'", "'red'", "'purple'", "'blue'", "'green'", "'brown'", "'black'", "random_color()"]
-command_list = {'forward':'forward(<distance?>)', 'right': 'right(<Degrees?>)',
-                'left': 'left(<Degrees?>)', 'if...':'if <what?>:\n# commands go here\n',
-                'back': 'back(<distance?>)', 'undo':'undo()',
-                'dot':'dot(<size>)',  'circle':'circle(<radius>)',
-                'penup':'penup()\n', 'pendown':'pendown()\n', 'goto': 'goto(<x, y>)',
-                'setheading':'setheading(<Degrees?>', '':''}
+command_dict = {'forward':'forward(<distance?>)',
+                'back': 'back(<distance?>)',
+                'left': 'left(<Degrees?>)',
+                'right': 'right(<Degrees?>)',
+                'speed':'speed(<"slow"-"normal"-"fast"-"fastest">)\n',
+                'circle':'circle(<radius>)\n',
+                'dot':'dot(<size>)\n',
+                'begin_fill':'begin_fill()\n',
+                'end_fill':'end_fill()\n',
+                'goto': 'goto(<x, y>)',
+                'pendown':'pendown()\n',
+                'penup':'penup()\n',
+                'show turtle':'showturtle()\n',
+                'hide turtle':'hideturtle()\n',
+                'setheading':'setheading(<Degrees?>',
+                'towards':'towards(<location (x,y)>)',
+                'if...':'if <what?>:\n# commands go here\n',
+                'repeat...':'for i in range(<how many times?>):\n# commands go here\n',
+                'while...':'while <what?>:\n# commands go here\n',
+                'rand. loc.':'random_location()',
+                'rand. color':'random_color()',
+                'rand. direction':'random_direction()',
+                'rand. size':'random_size(<max_size>)',
+                'undo':'undo()\n',
+                'full screen':'app.hide_grid()\nsetup(width=1.0, height=1.0)\nexitonclick()\n',
+                'exitonclick':'exitonclick()\n',
+                '':''
+                }
+command_list = ['forward',
+                'back',
+                'left',
+                'right',
+                'speed',
+                'circle',
+                'dot',
+                'begin_fill',
+                'end_fill',
+                'goto',
+                'pendown',
+                'penup',
+                'show turtle',
+                'hide turtle',
+                'setheading',
+                'towards',
+                'if...',
+                'repeat...',
+                'while...',
+                'rand. loc.',
+                'rand. color',
+                'rand. direction',
+                'rand. size',
+                'undo',
+                'full screen',
+                'exitonclick',
+                ''
+                ]
 
 local_dict = locals()
 
@@ -98,7 +150,6 @@ class TurtleConGUI(Frame):
         turtlesize(2)
         self.interp = newInterp(local_dict, self. error_box)
         ## self.run_code("""resizemode('auto')\npensize(5)\nshape('turtle')\ncolor('red')""")
-        self.tips = dict(command_list)
 
         self.edit_window.text.focus_set()
 
@@ -143,14 +194,6 @@ class TurtleConGUI(Frame):
         self.pen_v.set(3)
         self.pens = OptionMenu(self.pen_frame, self.pen_v, command=self.set_pen, *list(range(7)))
         self.pens.grid(row=0, column=1)
-        ## self.close_screen_btn = Button(self.tools_frame, text="Close Screen", command=self.close_screen, width=10)
-        ## self.close_screen_btn.grid(row=9, column=0, sticky=E+W+S)
-        self.repeat_btn = Button(self.tools_frame, text="repeat...", command=self.add_for)
-        self.repeat_btn.grid(row=3, column=0,sticky=W+E)
-        self.while_btn = Button(self.tools_frame, text="while...", command=self.add_while)
-        self.while_btn.grid(row=4, column=0,sticky=W+E)
-        self.if_btn = Button(self.tools_frame, text="if...", command=self.add_if)
-        self.if_btn.grid(row=5, column=0,sticky=W+E)
 
         self.command_frame = Frame(self.tools_frame)
         self.command_frame.grid(row=6, column=0, sticky=E+W)
@@ -159,7 +202,7 @@ class TurtleConGUI(Frame):
         self.command_v = StringVar()
         self.command_v.set("")
         self.commands = OptionMenu(self.command_frame, self.command_v, command=self.set_command,
-                                   *list(command_list.keys()))
+                                   *command_list)
         self.commands.grid(row=0, column=1, sticky=W)
             
             
@@ -236,7 +279,7 @@ class TurtleConGUI(Frame):
         self.run_code(size_str)
 
     def set_command(self, key=None):
-        command_strings = command_list[key].split("\n")
+        command_strings = command_dict[key].split("\n")
         for command_str in command_strings:
             startpos = len(command_str) - command_str.rfind("<")
             endpos = len(command_str) - (command_str.rfind(">") + 1)
@@ -250,43 +293,13 @@ class TurtleConGUI(Frame):
         self.edit_window.text.focus_set()
         self.command_v.set("")
 
-    def add_if(self):
-        command_str  = """if <what?>:"""
-        self.edit_window.text.insert(INSERT, command_str)
-        self.edit_window.text.tag_add("replace", str(INSERT) + "-8c", str(INSERT)+ "-1c")
-        self.edit_window.text.tag_config("replace",foreground="red", background="pink", underline=1)
-        self.edit_window.text.event_generate("<<newline-and-indent>>")
-        command_str  = """# commands go here"""
-        self.edit_window.text.insert(INSERT, command_str)
-        self.edit_window.text.event_generate("<<newline-and-indent>>")
-        self.edit_window.text.focus_set()
-        
-    def add_for(self):
-        command_str  = """for i in range(<how many times?>):"""
-        self.edit_window.text.insert(INSERT, command_str)
-        self.edit_window.text.tag_add("replace", str(INSERT) + "-19c", str(INSERT)+ "-2c")
-        self.edit_window.text.tag_config("replace",foreground="red", relief="raised", underline=1)
-        self.edit_window.text.event_generate("<<newline-and-indent>>")
-        command_str  = """# commands go here"""
-        self.edit_window.text.insert(INSERT, command_str)
-        self.edit_window.text.event_generate("<<newline-and-indent>>")
-        self.edit_window.text.focus_set()
-
-
-    def add_while(self):
-        command_str  = """while <what?>:"""
-        self.edit_window.text.insert(INSERT, command_str)
-        self.edit_window.text.tag_add("replace", str(INSERT) + "-8c", str(INSERT)+ "-1c")
-        self.edit_window.text.tag_config("replace",foreground="red", background="pink", underline=1)
-        self.edit_window.text.event_generate("<<newline-and-indent>>")
-        command_str  = """# commands go here"""
-        self.edit_window.text.insert(INSERT, command_str)
-        self.edit_window.text.event_generate("<<newline-and-indent>>")
-        self.edit_window.text.focus_set()
 
     def at_exit(self):
         bye()
-        self.edit_window.close()
+        try:
+            self.edit_window.close()
+        except:
+            self.edit_window.text_frame.destroy()
         self.destroy()
         ## sys.exit()
 
@@ -338,22 +351,23 @@ class TurtleConGUI(Frame):
     def hide_grid(self):
         cv = getcanvas()
         for item in self.grids:
-            cv.itemconfig(item, fill="White")
-#            cv.delete(item)
+            ## cv.itemconfig(item, fill="White")
+            cv.delete(item)
         cv.update()
         self.hide_grid_btn.config(command=self.grid_lines, text="Show Grid")
         ## for t in turtles():
         ##     t.update()
     def show_grid(self):
-        cv = getcanvas()
-        for item in self.grids:
-            cv.itemconfig(item, fill="gray75")
-#            cv.delete(item)
-        cv.update()
-        self.hide_grid_btn.config(command=self.grid_lines, text="Hide Grid")
+        self.grid_lines()
+##         cv = getcanvas()
+##         for item in self.grids:
+##             cv.itemconfig(item, fill="gray75")
+## #            cv.delete(item)
+##         cv.update()
+##         self.hide_grid_btn.config(command=self.grid_lines, text="Hide Grid")
 
-def random_size(size):
-    """returns a random size between 0 and size)"""
+def random_size(max_size):
+    """returns a random size between 1 and size)"""
     return randint(1, size)
 
 def random_location():
@@ -373,8 +387,6 @@ def random_color():
     
 #TODO: make control window stay on top unless minimized
 #TODO: make turtle window stay on top unless minimized
-
-#TODO: add turtle color, size and image manipulation
 
 app = TurtleConGUI()
 app.mainloop()
