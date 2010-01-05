@@ -18,20 +18,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-from turtle import *
-from turtle import _CFG
-_CFG['using_IDLE'] = True
+## from turtle import *
+## from turtle import _CFG
+## _CFG['using_IDLE'] = True
 from Tkinter import *
 from idlelib.ToolTip import ToolTip
 from idlelib.EditorWindow import EditorWindow
 import sys
+import os
+from os.path import join, expanduser
 import code
 from idlelib.CallTipWindow import *
 
-from random import randint, random
+
 
 # from tk_colors import tk_colors
-
+home_dir = os.environ['HOME']
+user_name =  os.environ['USER']
 color_list = ["'white'", "'gray'", "'yellow'", "'orange'", "'red'", "'purple'", "'blue'", "'green'", "'brown'", "'black'", "random_color()"]
 command_dict = {'forward':'forward(<distance?>)',
                 'back': 'back(<distance?>)',
@@ -111,6 +114,7 @@ class TurtleConGUI(Frame):
         Frame.__init__(self, master)
         self.master.title("Turtle Control")
         self.grid()
+        self.filename = os.path.join(os.path.expanduser("~", "turtlefile.py")
         self.edit_window = EditorWindow(root=master, filename='test.py')
         self.max_width =  master.winfo_screenwidth()
         self.max_height =  master.winfo_screenheight()
@@ -138,23 +142,31 @@ class TurtleConGUI(Frame):
         self.errors_h = self.toplevel.winfo_height()
         self.toplevel.geometry("%sx%s+%s+%s" % (self.errors_w, self.errors_h,self.errors_x, self.errors_y))
         self.error_box.update()
-        self.screen = Screen()
-        setup(width=.6, height=.75, startx=0, starty=0)
-        onclick(self.click)
-        self.grids = []
-        self.grid_lines()
-        resizemode('user')
-        pensize(5)
-        shape('turtle')
-        color('red')
-        turtlesize(2)
-        self.interp = newInterp(local_dict, self. error_box)
+        self.interp = newInterp(None, self. error_box)
+
+        self.run_code(
+        """from turtle import *
+from turtle import _CFG
+_CFG['using_IDLE'] = True
+setup(width=.6, height=.75, startx=0, starty=0)
+#onclick(self.click)
+resizemode('user')
+pensize(5)
+shape('turtle')
+color('red')
+turtlesize(2)
+""")
+        ## self.screen = Screen()
+        ## self.grids = []
+        self.load_gridline_functs()
+        self.show_grid()
+        self.load_random_functs()
         ## self.run_code("""resizemode('auto')\npensize(5)\nshape('turtle')\ncolor('red')""")
 
         self.edit_window.text.focus_set()
 
     def at_exit(self):
-        bye()
+        self.run_code("bye()")
         self.edit_window.close()
         self.destroy()
         ## sys.exit()
@@ -243,14 +255,15 @@ class TurtleConGUI(Frame):
             self.interp.showsyntaxerror()
 
     def reset_screen(self):
-        reset()
-        pensize(6)
-        shape('turtle')
-        turtlesize(2)
-        color('red')
-
+        self.run_code("""
+reset()
+pensize(3)
+shape('turtle')
+turtlesize(2)
+color('red')
+""")
     def close_screen(self):
-        bye()
+        self.run_code('bye()')
 
     def error_clear(self):
         """  clear error box """
@@ -295,7 +308,7 @@ class TurtleConGUI(Frame):
 
 
     def at_exit(self):
-        bye()
+        self.run_code("bye()")
         try:
             self.edit_window.close()
         except:
@@ -303,69 +316,70 @@ class TurtleConGUI(Frame):
         self.destroy()
         ## sys.exit()
 
-    def click(self,event=None, event2=None):
-        pencolor('black')
-        width(width()+2)
+    ## def click(self,event=None, event2=None):
+    ##     pencolor('black')
+    ##     width(width()+2)
 
-    def grid_lines(self):
-        cv = getcanvas()
-        line = cv.create_line(0, window_height()/2, 0, -window_height()/2, width=2, tags="gridline", fill="gray75")
-        self.grids.append(line)
-
-        line = cv.create_line(window_width()/2, 0, -window_width()/2, 0, width=2, fill="gray75", tags="gridline")
-        self.grids.append(line)
-        for x in range(100, window_width()/2, 100):
-            line = cv.create_line(x, window_height()/2, x, -window_height()/2, width=1,
-                                  fill="gray75",tags="gridline")
-            self.grids.append(line)
-            text = cv.create_text(x+20, 10, fill="gray75", text=str(x),tags="gridline")
-            self.grids.append(text)
-            
-        for x in range(-100, -window_width()/2, -100):
-            line = cv.create_line(x, window_height()/2, x, -window_height()/2, width=1,
-                                  fill="gray75",tags="gridline")
-            self.grids.append(line)
-            text = cv.create_text(x+20, 10, fill="gray75", text=str(x),tags="gridline")
-            self.grids.append(text)
-            
-
-        for y in range(100, window_height()/2, 100):
-            line = cv.create_line(window_width()/2, y, -window_width()/2, y, width=1,
-                                  fill="gray75",tags="gridline")
-            self.grids.append(line)
-            text = cv.create_text(20, y+10, fill="gray75", text=str(-y),tags="gridline")
-            self.grids.append(text)
-            
-        for y in range(-100, -window_height()/2, -100):
-            line = cv.create_line(window_width()/2, y, -window_width()/2, y, width=1,
-                                  fill="gray75",tags="gridline")
-            self.grids.append(line)
-            text = cv.create_text(20, y+10, fill="gray75", text=str(-y),tags="gridline")
-            self.grids.append(text)
-            self.hide_grid_btn.config(command=self.hide_grid, text="Hide Grid")
-        ## gl = cv.find_withtag("gridline")
-        ##cv.lower(gl)
-        ## cv.lower("gridline")
-        ## for item in self.grids:
-        ##     cv.lower(item)
     def hide_grid(self):
-        cv = getcanvas()
-        for item in self.grids:
-            ## cv.itemconfig(item, fill="White")
-            cv.delete(item)
-        cv.update()
-        self.hide_grid_btn.config(command=self.grid_lines, text="Show Grid")
-        ## for t in turtles():
-        ##     t.update()
+        self.run_code("""hide_grid()""")
+        self.hide_grid_btn.config(command=self.show_grid, text="Show Grid")
     def show_grid(self):
-        self.grid_lines()
-##         cv = getcanvas()
-##         for item in self.grids:
-##             cv.itemconfig(item, fill="gray75")
-## #            cv.delete(item)
-##         cv.update()
-##         self.hide_grid_btn.config(command=self.grid_lines, text="Hide Grid")
+        self.run_code("""show_grid()""")
+        self.hide_grid_btn.config(command=self.hide_grid, text="Hide Grid")
 
+    def load_gridline_functs(self):
+        self.run_code("""
+grids = []
+def show_grid():
+    global grids
+    cv = getcanvas()
+    line = cv.create_line(0, window_height()/2, 0, -window_height()/2, width=2,
+                          tags="gridline", fill="gray75")
+    grids.append(line)
+
+    line = cv.create_line(window_width()/2, 0, -window_width()/2, 0,
+                          width=2, fill="gray75", tags="gridline")
+    grids.append(line)
+    for x in range(100, window_width()/2, 100):
+        line = cv.create_line(x, window_height()/2, x, -window_height()/2,
+                              width=1, fill="gray75",tags="gridline")
+        grids.append(line)
+        text = cv.create_text(x+20, 10, fill="gray75", text=str(x),
+                              tags="gridline")
+        grids.append(text)
+
+    for x in range(-100, -window_width()/2, -100):
+        line = cv.create_line(x, window_height()/2, x, -window_height()/2,
+                              width=1, fill="gray75",tags="gridline")
+        grids.append(line)
+        text = cv.create_text(x+20, 10, fill="gray75", text=str(x),
+                              tags="gridline")
+        grids.append(text)
+
+    for y in range(100, window_height()/2, 100):
+        line = cv.create_line(window_width()/2, y, -window_width()/2, y,
+                              width=1, fill="gray75",tags="gridline")
+        grids.append(line)
+        text = cv.create_text(20, y+10, fill="gray75", text=str(-y),
+                              tags="gridline")
+        grids.append(text)
+
+    for y in range(-100, -window_height()/2, -100):
+        line = cv.create_line(window_width()/2, y, -window_width()/2, y,
+                              width=1, fill="gray75",tags="gridline")
+        grids.append(line)
+        text = cv.create_text(20, y+10, fill="gray75", text=str(-y),
+                              tags="gridline")
+        grids.append(text)
+
+def hide_grid():
+    cv = getcanvas()
+    for item in grids:
+        cv.delete(item)
+        cv.update()""")
+    def load_random_functs(self):
+        self.run_code('''
+from random import randint, random
 def random_size(max_size):
     """returns a random size between 1 and size)"""
     return randint(1, size)
@@ -383,7 +397,7 @@ def random_color():
         return randint(0,255), randint(0,255), randint(0,255)
     else:
         return random(), random(), random()
-        
+''') 
     
 #TODO: make control window stay on top unless minimized
 #TODO: make turtle window stay on top unless minimized
