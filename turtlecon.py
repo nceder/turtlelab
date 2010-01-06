@@ -60,7 +60,7 @@ command_dict = {'forward':'forward(<distance?>)',
                 'rand. direction':'random_direction()',
                 'rand. size':'random_size(<max_size>)',
                 'undo':'undo()\n',
-                'full screen':'app.hide_grid()\nsetup(width=1.0, height=1.0)\nexitonclick()\n',
+                'full screen':'hide_grid()\nsetup(width=1.0, height=1.0)\nexitonclick()\n',
                 'exitonclick':'exitonclick()\n',
                 '':''
                 }
@@ -114,8 +114,8 @@ class TurtleConGUI(Frame):
         Frame.__init__(self, master)
         self.master.title("Turtle Control")
         self.grid()
-        self.filename = os.path.join(os.path.expanduser("~", "turtlefile.py")
-        self.edit_window = EditorWindow(root=master, filename='test.py')
+        self.filename = join(expanduser("~"), "turtlefile.py")
+        self.edit_window = EditorWindow(root=master, filename=self.filename)
         self.max_width =  master.winfo_screenwidth()
         self.max_height =  master.winfo_screenheight()
         self.tools_x = int(self.max_width * .6)+6
@@ -149,18 +149,18 @@ class TurtleConGUI(Frame):
 from turtle import _CFG
 _CFG['using_IDLE'] = True
 setup(width=.6, height=.75, startx=0, starty=0)
-#onclick(self.click)
-resizemode('user')
-pensize(5)
-shape('turtle')
-color('red')
-turtlesize(2)
 """)
         ## self.screen = Screen()
         ## self.grids = []
         self.load_gridline_functs()
         self.show_grid()
         self.load_random_functs()
+        self.run_code("""resizemode('user')
+pensize(5)
+shape('turtle')
+color('red')
+turtlesize(2)
+""")
         ## self.run_code("""resizemode('auto')\npensize(5)\nshape('turtle')\ncolor('red')""")
 
         self.edit_window.text.focus_set()
@@ -247,6 +247,7 @@ turtlesize(2)
         code_text = self.edit_window.text.get(0.0,END)
         self.error_box.delete(1.0, END)
         self.run_code(code_text)
+        self.edit_window.text.event_generate("<<save-window>>")
         # need to grab output and display
         
     def run_code(self, code_text):
@@ -257,10 +258,6 @@ turtlesize(2)
     def reset_screen(self):
         self.run_code("""
 reset()
-pensize(3)
-shape('turtle')
-turtlesize(2)
-color('red')
 """)
     def close_screen(self):
         self.run_code('bye()')
