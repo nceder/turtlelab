@@ -53,7 +53,7 @@ command_dict = {'forward':'forward(<distance?>)',
                 'rand. direction':'random_direction()',
                 'rand. size':'random_size(<max_size>)',
                 'undo':'undo()\n',
-                'full screen':'hide_grid()\nsetup(width=1.0, height=1.0)\nexitonclick()\n',
+                'full screen':'hide_grid()\nsetup(width=1.0, height=1.0)\n',
                 'exitonclick':'exitonclick()\n',
                 '':''
                 }
@@ -374,7 +374,7 @@ def hide_grid():
     def load_random_functs(self):
         self.run_code('''
 from random import randint, random
-def random_size(max_size):
+def random_size(max_size=100):
     """returns a random size between 1 and size)"""
     return randint(1, max_size)
 
