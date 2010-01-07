@@ -18,7 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-## from turtle import *
+from turtle import *
 ## from turtle import _CFG
 ## _CFG['using_IDLE'] = True
 from Tkinter import *
@@ -31,10 +31,9 @@ import code
 from idlelib.CallTipWindow import *
 
 
-
 # from tk_colors import tk_colors
-home_dir = os.environ['HOME']
-user_name =  os.environ['USER']
+#home_dir = os.environ['HOME']
+#user_name =  os.environ['USER']
 color_list = ["'white'", "'gray'", "'yellow'", "'orange'", "'red'", "'purple'", "'blue'", "'green'", "'brown'", "'black'", "random_color()"]
 command_dict = {'forward':'forward(<distance?>)',
                 'back': 'back(<distance?>)',
@@ -114,7 +113,12 @@ class TurtleConGUI(Frame):
         Frame.__init__(self, master)
         self.master.title("Turtle Control")
         self.grid()
-        self.filename = join(expanduser("~"), "turtlefile.py")
+        self.filename = ""
+        if sys.platform == 'win32':
+            self.filename = join(os.environ.get('HOMEDRIVE', ""), os.environ.get('HOMEPATH', ""))
+        else:
+            self.filename = os.environ.get('HOME', "")
+        self.filename = join(self.filename, "turtlefile.py")
         self.edit_window = EditorWindow(root=master, filename=self.filename)
         self.max_width =  master.winfo_screenwidth()
         self.max_height =  master.winfo_screenheight()
@@ -142,13 +146,18 @@ class TurtleConGUI(Frame):
         self.errors_h = self.toplevel.winfo_height()
         self.toplevel.geometry("%sx%s+%s+%s" % (self.errors_w, self.errors_h,self.errors_x, self.errors_y))
         self.error_box.update()
-        self.interp = newInterp(None, self. error_box)
+        self.interp = newInterp(None, window=self.error_box)
 
         self.run_code(
         """from turtle import *
 from turtle import _CFG
 _CFG['using_IDLE'] = True
-setup(width=.6, height=.75, startx=0, starty=0)
+_CFG['width'] = .6
+_CFG['height'] = .75
+_CFG['topbottom'] = 0
+_CFG['leftright'] = True
+
+#setup(width=.6, height=.75, startx=0, starty=0)
 """)
         ## self.screen = Screen()
         ## self.grids = []
@@ -227,8 +236,10 @@ turtlesize(2)
         self.hide_grid_btn.grid(row=11, column=0, sticky=E+W+S)
         self.reset_screen_btn = Button(self.tools_frame, text="Reset Turtle", command=self.reset_screen, width=10)
         self.reset_screen_btn.grid(row=12, column=0, sticky=E+W+S)
+        self.close_screen_btn = Button(self.tools_frame, text="Close Screen", command=self.close_screen, width=10)
+        self.close_screen_btn.grid(row=13, column=0, sticky=E+W+S)
         self.quit_btn = Button(self.tools_frame, text="Quit", command=self.at_exit, width=10)
-        self.quit_btn.grid(row=13, column=0, sticky=E+W+S)
+        self.quit_btn.grid(row=14, column=0, sticky=E+W+S)
 
                                  
     def create_error_box(self):
@@ -245,19 +256,26 @@ turtlesize(2)
         """ compile code to code object and run """
         ## print getturtle().position()
         code_text = self.edit_window.text.get(0.0,END)
-        self.error_box.delete(1.0, END)
-        self.run_code(code_text)
+        self.error_clear()
         self.edit_window.text.event_generate("<<save-window>>")
+        self.run_code(code_text)
         # need to grab output and display
         
     def run_code(self, code_text):
         result = self.interp.runcode(code_text)
-        if not result:
+        if result:
             self.interp.showsyntaxerror()
 
     def reset_screen(self):
         self.run_code("""
 reset()
+hide_grid()
+show_grid()
+resizemode('user')
+pensize(5)
+shape('turtle')
+color('red')
+turtlesize(2)
 """)
     def close_screen(self):
         self.run_code('bye()')
@@ -379,7 +397,7 @@ def hide_grid():
 from random import randint, random
 def random_size(max_size):
     """returns a random size between 1 and size)"""
-    return randint(1, size)
+    return randint(1, max_size)
 
 def random_location():
     """ returns a random location on screen"""
