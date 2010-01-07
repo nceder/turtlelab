@@ -19,8 +19,6 @@
 
 """
 from turtle import *
-## from turtle import _CFG
-## _CFG['using_IDLE'] = True
 from Tkinter import *
 from idlelib.ToolTip import ToolTip
 from idlelib.EditorWindow import EditorWindow
@@ -30,10 +28,6 @@ from os.path import join, expanduser
 import code
 from idlelib.CallTipWindow import *
 
-
-# from tk_colors import tk_colors
-#home_dir = os.environ['HOME']
-#user_name =  os.environ['USER']
 color_list = ["'white'", "'gray'", "'yellow'", "'orange'", "'red'", "'purple'", "'blue'", "'green'", "'brown'", "'black'", "random_color()"]
 command_dict = {'forward':'forward(<distance?>)',
                 'back': 'back(<distance?>)',
@@ -134,7 +128,7 @@ class TurtleConGUI(Frame):
         self.edit_y = 0
         self.edit_w = self.max_width - (self.tools_x + self.tools_w+16)
         self.edit_h = int(self.max_height * .70)
-        ## print "%sx%s+%s+%s" % (self.edit_w, self.edit_h,self.edit_x, self.edit_y)
+
         self.edit_window.top.geometry("%sx%s+%s+%s" % (self.edit_w, self.edit_h,self.edit_x, self.edit_y))
         self.edit_window.text_frame.update()
         
@@ -159,8 +153,7 @@ _CFG['leftright'] = True
 
 #setup(width=.6, height=.75, startx=0, starty=0)
 """)
-        ## self.screen = Screen()
-        ## self.grids = []
+
         self.load_gridline_functs()
         self.show_grid()
         self.load_random_functs()
@@ -174,12 +167,6 @@ turtlesize(2)
 
         self.edit_window.text.focus_set()
 
-    def at_exit(self):
-        self.run_code("bye()")
-        self.edit_window.close()
-        self.destroy()
-        ## sys.exit()
-        
     def create_code_box(self):
 
         self.code_frame = Frame(self.master)
@@ -247,14 +234,11 @@ turtlesize(2)
         self.error_frame = Frame(self.toplevel)
         self.toplevel.title("Errors")
         self.error_frame.grid()
-        ## self.history_label = Label(self.error_frame, text="Errors")
-        ## self.history_label.grid(row=0, column=0, sticky=E+W)
         self.error_box = Text(self.error_frame, height=8, width=60)
         self.error_box.grid(row=0, column=0, sticky=E+W)
  
     def go(self, event=None):
         """ compile code to code object and run """
-        ## print getturtle().position()
         code_text = self.edit_window.text.get(0.0,END)
         self.error_clear()
         self.edit_window.text.event_generate("<<save-window>>")
@@ -329,11 +313,6 @@ turtlesize(2)
         except:
             self.edit_window.text_frame.destroy()
         self.destroy()
-        ## sys.exit()
-
-    ## def click(self,event=None, event2=None):
-    ##     pencolor('black')
-    ##     width(width()+2)
 
     def hide_grid(self):
         self.run_code("""hide_grid()""")
