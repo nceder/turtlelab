@@ -274,19 +274,19 @@ turtlesize(2)
         
     def set_color(self, value=None):
         color_str  = """color(%s)""" % (value)
-        self.edit_window.text.insert(END, color_str)
+        self.edit_window.text.insert(INSERT, color_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.run_code(color_str)
 
     def set_size(self, value=None):
         size_str  = """turtlesize(%s)""" % (value)
-        self.edit_window.text.insert(END, size_str)
+        self.edit_window.text.insert(INSERT, size_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.run_code(size_str)
 
-    def set_pen(self):
-        size_str  = """width(%s)""" % (self.pens.index(ACTIVE))
-        self.edit_window.text.insert(END, size_str)
+    def set_pen(self, value=None):
+        size_str  = """width(%s)""" % (value)
+        self.edit_window.text.insert(INSERT, size_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.run_code(size_str)
 
