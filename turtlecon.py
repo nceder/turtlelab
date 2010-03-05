@@ -1,6 +1,6 @@
 #!/bin/env python
 
-""" Console to "drive" the Python turtle
+""" Toolbar to "drive" the Python turtle
 
     Copyright 2009, Vern Ceder, vceder@gmail.com
    
@@ -109,7 +109,8 @@ class TurtleConGUI(Frame):
         self.grid()
         self.filename = ""
         if sys.platform == 'win32':
-            self.filename = join(os.environ.get('HOMEDRIVE', ""), os.environ.get('HOMEPATH', ""))
+            self.filename = join(os.environ.get('HOMEDRIVE', ""),
+                                 os.environ.get('HOMEPATH', ""))
         else:
             self.filename = os.environ.get('HOME', "")
         self.filename = join(self.filename, "turtlefile.py")
@@ -122,14 +123,16 @@ class TurtleConGUI(Frame):
         self.code_frame.update()
         self.tools_w = self.master.winfo_width()
         self.tools_h = self.master.winfo_height()
-        self.master.geometry("%sx%s+%s+%s" % (self.tools_w, self.tools_h,self.tools_x, self.tools_y))
+        self.master.geometry("%sx%s+%s+%s" % (self.tools_w, self.tools_h,
+                                              self.tools_x, self.tools_y))
 
         self.edit_x = self.tools_x + self.tools_w+ 6
         self.edit_y = 0
         self.edit_w = self.max_width - (self.tools_x + self.tools_w+16)
         self.edit_h = int(self.max_height * .70)
 
-        self.edit_window.top.geometry("%sx%s+%s+%s" % (self.edit_w, self.edit_h,self.edit_x, self.edit_y))
+        self.edit_window.top.geometry("%sx%s+%s+%s" % (self.edit_w, self.edit_h,
+                                                       self.edit_x, self.edit_y))
         self.edit_window.text_frame.update()
         
         self.errors_x = self.tools_x + self.tools_w+ 6
@@ -138,7 +141,8 @@ class TurtleConGUI(Frame):
         self.error_frame.update()
         self.errors_w = self.edit_window.top.winfo_width()
         self.errors_h = self.toplevel.winfo_height()
-        self.toplevel.geometry("%sx%s+%s+%s" % (self.errors_w, self.errors_h,self.errors_x, self.errors_y))
+        self.toplevel.geometry("%sx%s+%s+%s" % (self.errors_w, self.errors_h,
+                                                self.errors_x, self.errors_y))
         self.error_box.update()
         self.interp = newInterp(None, window=self.error_box)
 
@@ -163,7 +167,6 @@ shape('turtle')
 color('red')
 turtlesize(2)
 """)
-        ## self.run_code("""resizemode('auto')\npensize(5)\nshape('turtle')\ncolor('red')""")
 
         self.edit_window.text.focus_set()
 
@@ -173,7 +176,8 @@ turtlesize(2)
         self.code_frame.grid(row=0, column=0)
         self.tools_label = Label(self.code_frame, text="Tools")
         self.tools_label.grid(row=0, column=0, sticky=E+W)
-        self.tools_frame = Frame(self.code_frame, borderwidth=2, relief='sunken')
+        self.tools_frame = Frame(self.code_frame, borderwidth=2,
+                                 relief='sunken')
         self.tools_frame.grid(row=1, column=0, sticky=W+N+S)
 
         self.color_frame = Frame(self.tools_frame)
@@ -182,7 +186,8 @@ turtlesize(2)
         self.color_label.grid(row=0, column=0, sticky=W)
         self.color_v = StringVar()
         self.color_v.set("'red'")
-        self.colors = OptionMenu(self.color_frame, self.color_v, command=self.set_color, *color_list )
+        self.colors = OptionMenu(self.color_frame, self.color_v,
+                                 command=self.set_color, *color_list )
         self.colors.grid(row=0, column=1, sticky=E)
         
         self.size_frame = Frame(self.tools_frame)
@@ -191,7 +196,8 @@ turtlesize(2)
         self.sizes_label.grid(row=0, column=0, sticky=W+E)
         self.size_v = IntVar()
         self.size_v.set(2)
-        self.sizes = OptionMenu(self.size_frame, self.size_v, command=self.set_size, *list(range(5)))
+        self.sizes = OptionMenu(self.size_frame, self.size_v,
+                                command=self.set_size, *list(range(5)))
         self.sizes.grid(row=0, column=1,sticky=E)
 
         self.pen_frame = Frame(self.tools_frame)
@@ -200,16 +206,19 @@ turtlesize(2)
         self.pen_label.grid(row=0, column=0)
         self.pen_v = IntVar()
         self.pen_v.set(3)
-        self.pens = OptionMenu(self.pen_frame, self.pen_v, command=self.set_pen, *list(range(7)))
+        self.pens = OptionMenu(self.pen_frame, self.pen_v,
+                               command=self.set_pen, *list(range(7)))
         self.pens.grid(row=0, column=1)
 
         self.command_frame = Frame(self.tools_frame)
         self.command_frame.grid(row=6, column=0, sticky=E+W)
-        self.command_label = Label(self.command_frame, text="Commands", anchor=W)
+        self.command_label = Label(self.command_frame, text="Commands",
+                                   anchor=W)
         self.command_label.grid(row=0, column=0, sticky=W)
         self.command_v = StringVar()
         self.command_v.set("")
-        self.commands = OptionMenu(self.command_frame, self.command_v, command=self.set_command,
+        self.commands = OptionMenu(self.command_frame, self.command_v,
+                                   command=self.set_command,
                                    *command_list)
         self.commands.grid(row=0, column=1, sticky=W)
             
@@ -217,15 +226,20 @@ turtlesize(2)
         self.go_btn = Button(self.tools_frame, text="Go!", command=self.go)
         self.go_btn.grid(row=8, column=0, columnspan=2, sticky=E+W+S, pady=10)
         self.go_tip = ToolTip(self.go_btn, "Run the code")
-        self.code_clear_btn = Button(self.tools_frame, text="Clear code", command=self.code_clear)
+        self.code_clear_btn = Button(self.tools_frame, text="Clear code",
+                                     command=self.code_clear)
         self.code_clear_btn.grid(row=10, column=0, sticky=E+W+S)
-        self.hide_grid_btn = Button(self.tools_frame, text="Hide Grid", command=self.hide_grid, width=10)
+        self.hide_grid_btn = Button(self.tools_frame, text="Hide Grid",
+                                    command=self.hide_grid, width=10)
         self.hide_grid_btn.grid(row=11, column=0, sticky=E+W+S)
-        self.reset_screen_btn = Button(self.tools_frame, text="Reset Turtle", command=self.reset_screen, width=10)
+        self.reset_screen_btn = Button(self.tools_frame, text="Reset Turtle",
+                                       command=self.reset_screen, width=10)
         self.reset_screen_btn.grid(row=12, column=0, sticky=E+W+S)
-        self.close_screen_btn = Button(self.tools_frame, text="Close Screen", command=self.close_screen, width=10)
+        self.close_screen_btn = Button(self.tools_frame, text="Close Screen",
+                                       command=self.close_screen, width=10)
         self.close_screen_btn.grid(row=13, column=0, sticky=E+W+S)
-        self.quit_btn = Button(self.tools_frame, text="Quit", command=self.at_exit, width=10)
+        self.quit_btn = Button(self.tools_frame, text="Quit",
+                               command=self.at_exit, width=10)
         self.quit_btn.grid(row=14, column=0, sticky=E+W+S)
 
                                  
@@ -298,8 +312,12 @@ turtlesize(2)
             
             self.edit_window.text.insert(INSERT, command_str)
             if startpos <= len(command_str) and endpos < startpos:
-                self.edit_window.text.tag_add("replace", "%s-%sc" % (INSERT, startpos), "%s-%sc" % (INSERT, endpos))
-                self.edit_window.text.tag_config("replace",foreground="red", background="lightpink", underline=1)
+                self.edit_window.text.tag_add("replace", "%s-%sc" %
+                                              (INSERT, startpos),
+                                              "%s-%sc" % (INSERT, endpos))
+                self.edit_window.text.tag_config("replace",foreground="red",
+                                                 background="lightpink",
+                                                 underline=1)
             if command_str.strip():
                 self.edit_window.text.event_generate("<<newline-and-indent>>")
         self.edit_window.text.focus_set()
