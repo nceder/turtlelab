@@ -274,6 +274,8 @@ pensize(5)
 shape('turtle')
 color('red')
 turtlesize(2)
+tracer(1)
+delay(10)
 """)
     def close_screen(self):
         self.run_code('bye()')
