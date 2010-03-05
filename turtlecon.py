@@ -196,7 +196,7 @@ turtlesize(2)
 
         self.pen_frame = Frame(self.tools_frame)
         self.pen_frame.grid(row=2, column=0,sticky=W+E)
-        self.pen_label = Label(self.pen_frame, text="Pen width", anchor=W)
+        self.pen_label = Label(self.pen_frame, text="Pen size", anchor=W)
         self.pen_label.grid(row=0, column=0)
         self.pen_v = IntVar()
         self.pen_v.set(3)
@@ -276,19 +276,19 @@ turtlesize(2)
         color_str  = """color(%s)""" % (value)
         self.edit_window.text.insert(INSERT, color_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
-        self.run_code(color_str)
+#        self.run_code(color_str)
 
     def set_size(self, value=None):
         size_str  = """turtlesize(%s)""" % (value)
         self.edit_window.text.insert(INSERT, size_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
-        self.run_code(size_str)
+#        self.run_code(size_str)
 
     def set_pen(self, value=None):
-        size_str  = """width(%s)""" % (value)
+        size_str  = """pensize(%s)""" % (value)
         self.edit_window.text.insert(INSERT, size_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
-        self.run_code(size_str)
+#        self.run_code(size_str)
 
     def set_command(self, key=None):
         command_strings = command_dict[key].split("\n")
