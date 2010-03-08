@@ -411,6 +411,19 @@ def random_color():
         return randint(0,255), randint(0,255), randint(0,255)
     else:
         return random(), random(), random()
+def status():
+    t = getturtle()
+    print t.xcor(), t.ycor(), t.heading()
+
+def new_update(self):
+    status()
+    self.cv.update()
+    
+s = getturtle().getscreen()
+print s._update
+TurtleScreen._update = new_update
+print s._update
+s.ontimer(status, 0)
 ''') 
     
 #TODO: make control window stay on top unless minimized
