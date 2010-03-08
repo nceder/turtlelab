@@ -144,7 +144,7 @@ class TurtleConGUI(Frame):
         self.toplevel.geometry("%sx%s+%s+%s" % (self.errors_w, self.errors_h,
                                                 self.errors_x, self.errors_y))
         self.error_box.update()
-        self.interp = newInterp(None, window=self.error_box)
+        self.interp = newInterp({'status_dict':{'xy':self.status_xy, 'heading':self.status_h}}, window=self.error_box)
 
         self.run_code(
         """from turtle import *
@@ -154,18 +154,24 @@ _CFG['width'] = .6
 _CFG['height'] = .75
 _CFG['topbottom'] = 0
 _CFG['leftright'] = True
-
-#setup(width=.6, height=.75, startx=0, starty=0)
+_CFG['shape'] = 'turtle'
+_CFG['pencolor'] = 'red'
+_CFG['fillcolor'] = 'red'
+_CFG['pensize'] = 5
+_CFG['turtlesize'] = 2
+_CFG['resizemode'] = 'user'
 """)
 
         self.load_gridline_functs()
         self.show_grid()
         self.load_random_functs()
         self.run_code("""resizemode('user')
-pensize(5)
-shape('turtle')
-color('red')
-turtlesize(2)
+## print _CFG.items()
+
+pensize(_CFG['pensize'])
+shape(_CFG['shape'])
+color(_CFG['pencolor'])
+turtlesize(_CFG['turtlesize'])
 """)
 
         self.edit_window.text.focus_set()
@@ -241,6 +247,19 @@ turtlesize(2)
         self.quit_btn = Button(self.tools_frame, text="Quit",
                                command=self.at_exit, width=10)
         self.quit_btn.grid(row=14, column=0, sticky=E+W+S)
+        self.status_frame = Frame(self.tools_frame)
+        self.status_frame.grid(row=15, column=0, sticky=E+W)
+        self.status_label = Label(self.status_frame, text="Status",
+                                   anchor=W)
+        self.status_label.grid(row=0, column=0, sticky=E+W)
+        self.status_xy = StringVar()
+        self.status_xy.set("x: 0")
+        self.status_xy_label = Label(self.status_frame, textvar=self.status_xy)
+        self.status_xy_label.grid(row=1, column=0)
+        self.status_h = StringVar()
+        self.status_h.set("heading: 0")
+        self.status_h_label = Label(self.status_frame, textvar=self.status_h)
+        self.status_h_label.grid(row=2, column=0)
 
                                  
     def create_error_box(self):
@@ -255,7 +274,8 @@ turtlesize(2)
         """ compile code to code object and run """
         code_text = self.edit_window.text.get(0.0,END)
         self.error_clear()
-        self.edit_window.text.event_generate("<<save-window>>")
+        open(self.filename, "w").write(code_text)
+#        self.edit_window.text.event_generate("<<save-window>>")
         self.run_code(code_text)
         # need to grab output and display
         
@@ -292,19 +312,16 @@ delay(10)
         color_str  = """color(%s)""" % (value)
         self.edit_window.text.insert(INSERT, color_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
-#        self.run_code(color_str)
 
     def set_size(self, value=None):
         size_str  = """turtlesize(%s)""" % (value)
         self.edit_window.text.insert(INSERT, size_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
-#        self.run_code(size_str)
 
     def set_pen(self, value=None):
         size_str  = """pensize(%s)""" % (value)
         self.edit_window.text.insert(INSERT, size_str)
         self.edit_window.text.event_generate("<<newline-and-indent>>")
-#        self.run_code(size_str)
 
     def set_command(self, key=None):
         command_strings = command_dict[key].split("\n")
@@ -413,21 +430,20 @@ def random_color():
         return random(), random(), random()
 def status():
     t = getturtle()
-    print t.xcor(), t.ycor(), t.heading()
+    status_dict['xy'].set("x:%4.0f  y:%4.0f" % (t.position()))
+    status_dict['heading'].set("heading:%3d" % (t.heading()))
 
 def new_update(self):
     status()
     self.cv.update()
     
-s = getturtle().getscreen()
-print s._update
 TurtleScreen._update = new_update
-print s._update
-s.ontimer(status, 0)
 ''') 
     
 #TODO: make control window stay on top unless minimized
 #TODO: make turtle window stay on top unless minimized
 
-app = TurtleConGUI()
-app.mainloop()
+if __name__ == '__main__':
+
+    app = TurtleConGUI()
+    app.mainloop()
