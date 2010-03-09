@@ -1,4 +1,3 @@
-from turtle import *
 from random import *
 tracer(False)
 width(3)
@@ -13,5 +12,4 @@ for i in range(figures):
         forward(size)
         right(360.0/sides)
     right (360.0/figures)
-
-done()
+update()

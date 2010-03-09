@@ -144,7 +144,7 @@ class TurtleConGUI(Frame):
         self.toplevel.geometry("%sx%s+%s+%s" % (self.errors_w, self.errors_h,
                                                 self.errors_x, self.errors_y))
         self.error_box.update()
-        self.interp = newInterp({'status_dict':{'xy':self.status_xy, 'heading':self.status_h}}, window=self.error_box)
+        self.interp = newInterp({'status_dict':{'xy':self.status_xy, 'heading':self.status_h, 'penrgb':self.status_penrgb, 'fillrgb':self.status_fillrgb}}, window=self.error_box)
 
         self.run_code(
         """from turtle import *
@@ -260,6 +260,14 @@ turtlesize(_CFG['turtlesize'])
         self.status_h.set("heading: 0")
         self.status_h_label = Label(self.status_frame, textvar=self.status_h)
         self.status_h_label.grid(row=2, column=0)
+        self.status_penrgb = StringVar()
+        self.status_penrgb.set("penrgb:  0,  0,  0")
+        self.status_penrgb_label = Label(self.status_frame, textvar=self.status_penrgb)
+        self.status_penrgb_label.grid(row=3, column=0)
+        self.status_fillrgb = StringVar()
+        self.status_fillrgb.set("fillrgb:  0,  0,  0")
+        self.status_fillrgb_label = Label(self.status_frame, textvar=self.status_fillrgb)
+        self.status_fillrgb_label.grid(row=4, column=0)
 
                                  
     def create_error_box(self):
@@ -432,6 +440,22 @@ def status():
     t = getturtle()
     status_dict['xy'].set("x:%4.0f  y:%4.0f" % (t.position()))
     status_dict['heading'].set("heading:%3d" % (t.heading()))
+
+    for item in ('pen','fill'):
+        colorstr = t._colorstr(t.pen()[item+'color'])
+        if not colorstr.startswith("#"):
+            try:
+                rgblist = [c/256 for c in t.screen.cv.winfo_rgb(colorstr)]
+            except TK.TclError:
+                raise Exception("bad colorstring: %s" % colorstr)
+        elif len(colorstr) == 7:
+            rgblist = [int(colorstr[i:i+2], 16) for i in (1, 3, 5)]
+        elif len(colorstr) == 4:
+            rgblist = [16*int(colorstr[h], 16) for h in colorstr[1:]]
+        else:
+            raise Exception("bad colorstring: %s" % colorstr)
+        colorstatus = item+":%3.0f,%3.0f,%3.0f" % tuple(rgblist)
+        status_dict[item+'rgb'].set(colorstatus)
 
 def new_update(self):
     status()
