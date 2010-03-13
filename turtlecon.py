@@ -438,6 +438,7 @@ def random_color():
         return random(), random(), random()
 def status():
     t = getturtle()
+        
     status_dict['xy'].set("x:%4.0f  y:%4.0f" % (t.position()))
     status_dict['heading'].set("heading:%3d" % (t.heading()))
 
@@ -458,9 +459,11 @@ def status():
         status_dict[item+'rgb'].set(colorstatus)
 
 def new_update(self):
-    status()
+    if Turtle._pen is not None:
+        status()
     self.cv.update()
-    
+
+old_update = TurtleScreen._update
 TurtleScreen._update = new_update
 ''') 
     
