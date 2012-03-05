@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-""" Toolbar to "drive" the Python turtle
+""" Toolbar to "drive" the Python turtle 
 
-    Copyright 2009, Vern Ceder, vceder@gmail.com
+    Copyright 2009, Vern Ceder, vceder@gmail.com  
    
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    (at your option) any later version.  
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,6 +30,10 @@ import os
 from os.path import join, expanduser
 import code
 
+# force UTF-8 encoding...
+reload(sys)                              # restore module sys from disk
+sys.setdefaultencoding('utf-8')          # or whatever codec you need
+del sys.setdefaultencoding               # ensure against later accidents
 
 
 
