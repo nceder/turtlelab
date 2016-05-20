@@ -2,7 +2,7 @@
 
 """ Toolbar to "drive" the Python turtle 
 
-    Copyright 2009, Vern Ceder, vceder@gmail.com  
+    Copyright 2009, Naomi Ceder, naomi.ceder@gmail.com  
    
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

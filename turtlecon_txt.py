@@ -2,7 +2,7 @@
 
 """ Console to "drive" the turtle
 
-    VLC, 12/10/2009
+    NRC, 12/10/2009
 
 """
 
