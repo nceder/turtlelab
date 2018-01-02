@@ -23,10 +23,10 @@ The screenshots below should give some idea of what turtlelab does:
 3. After putting in 100 for the distance, the student clicks "Go!" and the code is saved and the command is executed:
 
 ![forward(100) - before](tc3a.jpg)
-![forward(100) - after](tc4a.jpg)
 
 4. Loops can be added...
 
+![forward(100) - after](tc4a.jpg)
 ![square](tc5a.jpg)
 
 5. and more complicated patterns can be created with the supplied random_color(), random_location(), random_size(), etc functions:
