@@ -14,18 +14,20 @@ The screenshots below should give some idea of what turtlelab does:
 
 1. Below the command menu is showing... clicking on a command will insert that command into the code window:
 
-![command list](tc1.jpg)
+![command list](tc1a.jpg)
 
 2. The 'forward' command has just been selected. The highlighted section needs to be replaced with a meaningful value.
 
+![command list](tc2a.jpg)
 
 3. After putting in 100 for the distance, the student clicks "Go!" and the code is saved and the command is executed:
 
-![forward(100)](tc3.jpg)
+![forward(100) - before](tc3a.jpg)
+![forward(100) - after](tc4a.jpg)
 
 4. Loops can be added...
 
-![square](tc4.jpg)
+![square](tc5a.jpg)
 
 5. and more complicated patterns can be created with the supplied random_color(), random_location(), random_size(), etc functions:
 
